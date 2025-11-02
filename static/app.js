@@ -165,11 +165,9 @@ function initializeApp() {
 
 function setupHeroPage() {
     const getStartedBtn = document.getElementById('get-started-btn');
-    const getStartedFooterBtn = document.getElementById('get-started-footer-btn');
     const skipIntroBtn = document.getElementById('skip-intro-btn');
     const learnMoreBtn = document.getElementById('learn-more-btn');
     const featureCards = document.querySelectorAll('.feature-card-mini');
-    const featureBoxes = document.querySelectorAll('.feature-box');
     
     const startApp = () => {
         sessionStorage.setItem('welcomed', 'true');
@@ -183,18 +181,14 @@ function setupHeroPage() {
         getStartedBtn.addEventListener('click', startApp);
     }
     
-    if (getStartedFooterBtn) {
-        getStartedFooterBtn.addEventListener('click', startApp);
-    }
-    
     if (skipIntroBtn) {
         skipIntroBtn.addEventListener('click', startApp);
     }
     
     if (learnMoreBtn) {
         learnMoreBtn.addEventListener('click', () => {
-            // Smooth scroll to features section
-            const featuresSection = document.querySelector('.hero-features-section');
+            // Scroll to feature cards section
+            const featuresSection = document.querySelector('.hero-visual-section');
             if (featuresSection) {
                 featuresSection.scrollIntoView({ behavior: 'smooth' });
             }
@@ -204,11 +198,6 @@ function setupHeroPage() {
     // Make feature cards clickable
     featureCards.forEach(card => {
         card.addEventListener('click', startApp);
-    });
-    
-    // Make feature boxes clickable
-    featureBoxes.forEach(box => {
-        box.addEventListener('click', startApp);
     });
     
     // Setup home button and clickable logo
