@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 # Configure Gemini API
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBWaCzAIn4b2Yb8_DMWTCX9SHZXC_uezXE")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your_Api_key_here")
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
