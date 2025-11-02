@@ -18,18 +18,176 @@
         </div>
     </div>
 
+    <!-- Hero/Landing Page -->
+    <div id="hero-page" class="hero-page">
+        <nav class="hero-nav">
+            <div class="hero-nav-content">
+                <div class="hero-logo-nav">
+                    <span class="logo-icon-nav">🎓</span>
+                    <span class="logo-text-nav">StudyMentor AI</span>
+                </div>
+                <button id="skip-intro-btn" class="btn-text">Skip to App →</button>
+            </div>
+        </nav>
+        
+        <div class="hero-main">
+            <div class="hero-container">
+                <div class="hero-text-section">
+                    <div class="hero-badge">
+                        <span class="badge-icon">✨</span>
+                        <span>Powered by Google Gemini AI</span>
+                    </div>
+                    
+                    <h1 class="hero-main-title">
+                        Master Any Skill with
+                        <span class="gradient-text">AI-Powered</span>
+                        Learning
+                    </h1>
+                    
+                    <p class="hero-description">
+                        Your personal AI study companion that creates customized learning roadmaps, 
+                        tracks your progress, and keeps you motivated with smart study techniques.
+                    </p>
+                    
+                    <div class="hero-cta-section">
+                        <button id="get-started-btn" class="btn-cta btn-cta-primary">
+                            <span>Start Learning Free</span>
+                            <span class="btn-icon">🚀</span>
+                        </button>
+                        <button id="learn-more-btn" class="btn-cta btn-cta-secondary">
+                            <span>How It Works</span>
+                        </button>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item-hero">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label-hero">Free to Use</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item-hero">
+                            <div class="stat-number">AI-Powered</div>
+                            <div class="stat-label-hero">Smart Roadmaps</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item-hero">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label-hero">Study Assistant</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual-section">
+                    <div class="feature-cards-stack">
+                        <div class="feature-card-mini card-1">
+                            <div class="card-icon">🤖</div>
+                            <div class="card-content-mini">
+                                <h4>AI Chat Assistant</h4>
+                                <p>Get instant help and study advice</p>
+                            </div>
+                        </div>
+                        <div class="feature-card-mini card-2">
+                            <div class="card-icon">🗺️</div>
+                            <div class="card-content-mini">
+                                <h4>Custom Roadmaps</h4>
+                                <p>Tailored learning paths just for you</p>
+                            </div>
+                        </div>
+                        <div class="feature-card-mini card-3">
+                            <div class="card-icon">📊</div>
+                            <div class="card-content-mini">
+                                <h4>Progress Tracking</h4>
+                                <p>Monitor your learning journey</p>
+                            </div>
+                        </div>
+                        <div class="feature-card-mini card-4">
+                            <div class="card-icon">⏰</div>
+                            <div class="card-content-mini">
+                                <h4>Pomodoro Timer</h4>
+                                <p>Stay focused and productive</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-features-section">
+            <div class="hero-container">
+                <h2 class="features-title">Everything You Need to Succeed</h2>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon-large">�</div>
+                        <h3>AI Study Chat</h3>
+                        <p>Ask questions, get explanations, and receive personalized study advice anytime</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-large">🎯</div>
+                        <h3>Daily Goals</h3>
+                        <p>Set and track daily learning goals with visual progress tracking</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-large">📚</div>
+                        <h3>Learning Roadmaps</h3>
+                        <p>AI-generated step-by-step plans customized to your goals and schedule</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-large">⚡</div>
+                        <h3>Focus Mode</h3>
+                        <p>Distraction-free dark mode with Pomodoro timer for deep work sessions</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-large">�</div>
+                        <h3>Progress Analytics</h3>
+                        <p>Visualize your learning journey with detailed statistics and insights</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-large">🎨</div>
+                        <h3>Personalized Experience</h3>
+                        <p>Choose between Focus and Friendly modes to match your study style</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-footer">
+            <div class="hero-container">
+                <div class="footer-cta">
+                    <h2>Ready to Transform Your Learning?</h2>
+                    <p>Join thousands of students achieving their goals with AI-powered study tools</p>
+                    <button id="get-started-footer-btn" class="btn-cta btn-cta-primary">
+                        <span>Get Started Now</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="animated-bg">
+            <div class="bg-gradient-1"></div>
+            <div class="bg-gradient-2"></div>
+            <div class="bg-gradient-3"></div>
+        </div>
+    </div>
+
     <!-- Main Application Container -->
     <div id="app" class="app hidden">
         <!-- Header with Mode Toggle -->
         <header class="app-header">
             <div class="header-content">
-                <div class="logo">
+                <div class="logo clickable-logo" id="home-logo" title="Back to Home Page">
                     <h1>🎓 AI Study Mentor</h1>
                 </div>
                 <div class="header-controls">
+                    <button id="home-btn" class="btn-icon home-btn" aria-label="Back to Home" title="Back to Home Page">
+                        🏠
+                    </button>
                     <button id="mode-toggle" class="btn btn--outline mode-toggle" aria-label="Toggle between Focus and Friendly mode">
                         <span class="mode-icon">🌙</span>
                         <span class="mode-text">Focus Mode</span>
+                    </button>
+                    <button id="settings-btn" class="btn-icon" aria-label="Settings" title="Settings">
+                        ⚙️
                     </button>
                 </div>
             </div>
@@ -125,13 +283,58 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <h3>Study Timer</h3>
-                    <div class="timer-display" id="timer-display">25:00</div>
-                    <div class="timer-controls">
-                        <button id="timer-start" class="btn btn--sm">Start</button>
-                        <button id="timer-pause" class="btn btn--sm">Pause</button>
-                        <button id="timer-reset" class="btn btn--sm">Reset</button>
+                    <h3>Today's Goals</h3>
+                    <div class="daily-goals-container">
+                        <div class="goals-progress">
+                            <div class="goals-circle">
+                                <svg class="progress-ring" width="120" height="120">
+                                    <circle class="progress-ring-circle-bg" cx="60" cy="60" r="52" />
+                                    <circle class="progress-ring-circle" cx="60" cy="60" r="52" />
+                                </svg>
+                                <div class="progress-text">
+                                    <span class="progress-value" id="goals-completed">0</span>
+                                    <span class="progress-total">/ <span id="goals-total">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="daily-goals-list" id="daily-goals-list">
+                            <!-- Goals will be added dynamically -->
+                        </div>
+                        <button class="btn btn--sm btn--full-width" id="add-goal-btn">+ Add Goal</button>
                     </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Study Timer</h3>
+                    <div class="timer-settings">
+                        <button class="btn-icon timer-settings-btn" id="timer-settings-btn" title="Timer Settings">
+                            ⚙️
+                        </button>
+                    </div>
+                    <div class="timer-display" id="timer-display">25:00</div>
+                    <div class="timer-type" id="timer-type">Work Session</div>
+                    <div class="timer-controls">
+                        <button id="timer-start" class="btn btn--sm">▶️ Start</button>
+                        <button id="timer-pause" class="btn btn--sm">⏸️ Pause</button>
+                        <button id="timer-reset" class="btn btn--sm">🔄 Reset</button>
+                    </div>
+                    <div class="timer-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Sessions Today:</span>
+                            <span class="stat-value" id="sessions-today">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Time:</span>
+                            <span class="stat-value" id="total-time-today">0h 0m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Study Techniques</h3>
+                    <button class="btn btn--secondary btn--full-width quick-action-btn" data-action="study-techniques">
+                        🧠 View Techniques
+                    </button>
                 </div>
 
                 <div class="sidebar-section">
@@ -362,6 +565,125 @@
     </div>
 
     <!-- Modals -->
+    <!-- Timer Settings Modal -->
+    <div id="timer-settings-modal" class="modal hidden" role="dialog" aria-labelledby="timer-settings-title" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="timer-settings-title">⚙️ Timer Settings</h2>
+                <button class="modal-close" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Work Duration (minutes):</label>
+                    <input type="number" id="work-duration" class="form-control" value="25" min="1" max="60">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Short Break (minutes):</label>
+                    <input type="number" id="short-break" class="form-control" value="5" min="1" max="30">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Long Break (minutes):</label>
+                    <input type="number" id="long-break" class="form-control" value="15" min="1" max="60">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sessions Until Long Break:</label>
+                    <input type="number" id="sessions-until-long-break" class="form-control" value="4" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="auto-start-breaks"> Auto-start breaks
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="notification-sound" checked> Play notification sound
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="save-timer-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div id="add-goal-modal" class="modal hidden" role="dialog" aria-labelledby="add-goal-title" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="add-goal-title">🎯 Add Today's Goal</h2>
+                <button class="modal-close" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Goal Description:</label>
+                    <input type="text" id="goal-input" class="form-control" placeholder="e.g., Complete 2 chapters of Python course">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estimated Time (minutes):</label>
+                    <input type="number" id="goal-time" class="form-control" value="30" min="5" max="480">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="save-goal-btn">Add Goal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden" role="dialog" aria-labelledby="settings-title" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="settings-title">⚙️ Settings</h2>
+                <button class="modal-close" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal-body">
+                <h3>Preferences</h3>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="save-theme" checked> Remember theme preference
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="show-welcome" checked> Show welcome screen on startup
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Keyboard Shortcuts:</label>
+                    <div class="shortcuts-list">
+                        <div class="shortcut-item">
+                            <kbd>Ctrl</kbd> + <kbd>K</kbd> - Focus chat input
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl</kbd> + <kbd>T</kbd> - Toggle timer
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl</kbd> + <kbd>M</kbd> - Toggle mode
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl</kbd> + <kbd>G</kbd> - Add goal
+                        </div>
+                    </div>
+                </div>
+                <h3>Data Management</h3>
+                <div class="form-group">
+                    <button class="btn btn--outline btn--full-width" id="export-data-btn">📥 Export Study Data</button>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn--outline btn--full-width" id="clear-data-btn">🗑️ Clear All Data</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--primary modal-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Celebration Modal -->
     <div id="celebration-modal" class="modal hidden" role="dialog" aria-labelledby="celebration-title" aria-hidden="true">
         <div class="modal-backdrop"></div>

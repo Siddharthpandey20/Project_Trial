@@ -4,14 +4,31 @@
 
 const AppState = {
     currentMode: null,
-    currentView: 'mode-selection',
+    currentView: 'hero-page',
     currentRoadmapId: null,
     chatHistory: [],
     timerInterval: null,
     timerSeconds: 1500, // 25 minutes
+    timerType: 'work', // work, short-break, long-break
     sessionInterval: null,
     sessionSeconds: 0,
-    progressData: null
+    progressData: null,
+    dailyGoals: [],
+    completedGoals: 0,
+    sessionsCompleted: 0,
+    totalTimeToday: 0,
+    timerSettings: {
+        workDuration: 25,
+        shortBreak: 5,
+        longBreak: 15,
+        sessionsUntilLongBreak: 4,
+        autoStartBreaks: false,
+        notificationSound: true
+    },
+    preferences: {
+        saveTheme: true,
+        showWelcome: true
+    }
 };
 
 // ============================================
@@ -96,24 +113,234 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeApp() {
-    // Hide loading screen
-    setTimeout(() => {
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-    }, 1500);
+    // Load saved preferences
+    loadPreferences();
+    
+    // Check if we should show welcome screen
+    const heroPage = document.getElementById('hero-page');
+    const appPage = document.getElementById('app');
+    const loadingScreen = document.getElementById('loading-screen');
+    
+    if (AppState.preferences.showWelcome && !sessionStorage.getItem('welcomed')) {
+        setTimeout(() => {
+            if (loadingScreen) loadingScreen.classList.add('hidden');
+            if (heroPage) heroPage.classList.remove('hidden');
+        }, 1500);
+    } else {
+        // Skip to app
+        setTimeout(() => {
+            if (loadingScreen) loadingScreen.classList.add('hidden');
+            if (appPage) appPage.classList.remove('hidden');
+            if (AppState.currentMode) {
+                navigateToView('chat-view');
+            }
+        }, 1500);
+    }
     
     // Initialize event listeners
+    setupHeroPage();
     setupModeSelection();
     setupChat();
     setupRoadmapGeneration();
     setupProgressDashboard();
     setupModals();
     setupTimer();
+    setupDailyGoals();
+    setupKeyboardShortcuts();
+    setupSettings();
     loadDailyMotivation();
+    loadDailyStats();
     
     // Set minimum date for deadline inputs
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('deadline').setAttribute('min', today);
+    const deadlineInput = document.getElementById('deadline');
+    if (deadlineInput) {
+        const today = new Date().toISOString().split('T')[0];
+        deadlineInput.setAttribute('min', today);
+    }
+}
+
+// ============================================
+// HERO PAGE
+// ============================================
+
+function setupHeroPage() {
+    const getStartedBtn = document.getElementById('get-started-btn');
+    const getStartedFooterBtn = document.getElementById('get-started-footer-btn');
+    const skipIntroBtn = document.getElementById('skip-intro-btn');
+    const learnMoreBtn = document.getElementById('learn-more-btn');
+    const featureCards = document.querySelectorAll('.feature-card-mini');
+    const featureBoxes = document.querySelectorAll('.feature-box');
+    
+    const startApp = () => {
+        sessionStorage.setItem('welcomed', 'true');
+        const heroPage = document.getElementById('hero-page');
+        const appPage = document.getElementById('app');
+        if (heroPage) heroPage.classList.add('hidden');
+        if (appPage) appPage.classList.remove('hidden');
+    };
+    
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', startApp);
+    }
+    
+    if (getStartedFooterBtn) {
+        getStartedFooterBtn.addEventListener('click', startApp);
+    }
+    
+    if (skipIntroBtn) {
+        skipIntroBtn.addEventListener('click', startApp);
+    }
+    
+    if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', () => {
+            // Smooth scroll to features section
+            const featuresSection = document.querySelector('.hero-features-section');
+            if (featuresSection) {
+                featuresSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+    
+    // Make feature cards clickable
+    featureCards.forEach(card => {
+        card.addEventListener('click', startApp);
+    });
+    
+    // Make feature boxes clickable
+    featureBoxes.forEach(box => {
+        box.addEventListener('click', startApp);
+    });
+    
+    // Setup home button and clickable logo
+    setupHomeNavigation();
+}
+
+// ============================================
+// HOME NAVIGATION
+// ============================================
+
+function setupHomeNavigation() {
+    const homeLogo = document.getElementById('home-logo');
+    const homeBtn = document.getElementById('home-btn');
+    
+    const goToHome = () => {
+        const heroPage = document.getElementById('hero-page');
+        const appPage = document.getElementById('app');
+        
+        if (heroPage && appPage) {
+            appPage.classList.add('hidden');
+            heroPage.classList.remove('hidden');
+            sessionStorage.removeItem('welcomed');
+            
+            // Reset to initial view
+            navigateToView('mode-selection');
+            
+            // Clear chat if needed
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                // Optionally clear chat history
+                // chatMessages.innerHTML = '';
+            }
+        }
+    };
+    
+    if (homeLogo) {
+        homeLogo.addEventListener('click', goToHome);
+        homeLogo.style.cursor = 'pointer';
+    }
+    
+    if (homeBtn) {
+        homeBtn.addEventListener('click', goToHome);
+    }
+}
+
+// ============================================
+// PREFERENCES & LOCAL STORAGE
+// ============================================
+
+function loadPreferences() {
+    const savedMode = localStorage.getItem('studyMentorMode');
+    const savedTheme = localStorage.getItem('saveTheme');
+    const savedWelcome = localStorage.getItem('showWelcome');
+    const savedTimerSettings = localStorage.getItem('timerSettings');
+    const savedGoals = localStorage.getItem('dailyGoals');
+    const savedStats = localStorage.getItem('dailyStats');
+    
+    if (savedMode && savedTheme !== 'false') {
+        AppState.currentMode = savedMode;
+        document.body.className = savedMode === 'focus' ? 'focus-mode' : 'friendly-mode';
+    }
+    
+    if (savedWelcome !== null) {
+        AppState.preferences.showWelcome = savedWelcome === 'true';
+    }
+    
+    if (savedTimerSettings) {
+        AppState.timerSettings = JSON.parse(savedTimerSettings);
+        AppState.timerSeconds = AppState.timerSettings.workDuration * 60;
+    }
+    
+    if (savedGoals) {
+        const goalsData = JSON.parse(savedGoals);
+        const today = new Date().toDateString();
+        if (goalsData.date === today) {
+            AppState.dailyGoals = goalsData.goals;
+            updateGoalsDisplay();
+        }
+    }
+    
+    if (savedStats) {
+        const statsData = JSON.parse(savedStats);
+        const today = new Date().toDateString();
+        if (statsData.date === today) {
+            AppState.sessionsCompleted = statsData.sessions;
+            AppState.totalTimeToday = statsData.totalTime;
+        }
+    }
+}
+
+function savePreferences() {
+    if (AppState.preferences.saveTheme && AppState.currentMode) {
+        localStorage.setItem('studyMentorMode', AppState.currentMode);
+    }
+    localStorage.setItem('saveTheme', AppState.preferences.saveTheme);
+    localStorage.setItem('showWelcome', AppState.preferences.showWelcome);
+}
+
+function saveDailyGoals() {
+    const goalsData = {
+        date: new Date().toDateString(),
+        goals: AppState.dailyGoals
+    };
+    localStorage.setItem('dailyGoals', JSON.stringify(goalsData));
+}
+
+function saveDailyStats() {
+    const statsData = {
+        date: new Date().toDateString(),
+        sessions: AppState.sessionsCompleted,
+        totalTime: AppState.totalTimeToday
+    };
+    localStorage.setItem('dailyStats', JSON.stringify(statsData));
+}
+
+function loadDailyStats() {
+    updateStatsDisplay();
+}
+
+function updateStatsDisplay() {
+    const sessionsToday = document.getElementById('sessions-today');
+    const totalTimeToday = document.getElementById('total-time-today');
+    
+    if (sessionsToday) {
+        sessionsToday.textContent = AppState.sessionsCompleted;
+    }
+    
+    if (totalTimeToday) {
+        const hours = Math.floor(AppState.totalTimeToday / 60);
+        const minutes = AppState.totalTimeToday % 60;
+        totalTimeToday.textContent = `${hours}h ${minutes}m`;
+    }
 }
 
 // ============================================
@@ -138,6 +365,9 @@ function setupModeSelection() {
 function selectMode(mode) {
     AppState.currentMode = mode;
     document.body.className = mode === 'focus' ? 'focus-mode' : 'friendly-mode';
+    
+    // Save preference
+    savePreferences();
     
     // Update mode toggle button
     const modeToggle = document.getElementById('mode-toggle');
@@ -699,10 +929,14 @@ function setupTimer() {
     const startBtn = document.getElementById('timer-start');
     const pauseBtn = document.getElementById('timer-pause');
     const resetBtn = document.getElementById('timer-reset');
+    const settingsBtn = document.getElementById('timer-settings-btn');
     
-    startBtn.addEventListener('click', startTimer);
-    pauseBtn.addEventListener('click', pauseTimer);
-    resetBtn.addEventListener('click', resetTimer);
+    if (startBtn) startBtn.addEventListener('click', startTimer);
+    if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
+    if (resetBtn) resetBtn.addEventListener('click', resetTimer);
+    if (settingsBtn) settingsBtn.addEventListener('click', () => showModal('timer-settings-modal'));
+    
+    updateTimerDisplay();
 }
 
 function startTimer() {
@@ -713,10 +947,7 @@ function startTimer() {
             AppState.timerSeconds--;
             updateTimerDisplay();
         } else {
-            pauseTimer();
-            showCelebrationModal('Pomodoro Complete! 🍅', 'Great work! Time for a 5-minute break.');
-            AppState.timerSeconds = 1500;
-            updateTimerDisplay();
+            timerComplete();
         }
     }, 1000);
 }
@@ -728,15 +959,320 @@ function pauseTimer() {
 
 function resetTimer() {
     pauseTimer();
-    AppState.timerSeconds = 1500;
+    AppState.timerSeconds = AppState.timerSettings.workDuration * 60;
+    AppState.timerType = 'work';
+    updateTimerDisplay();
+}
+
+function timerComplete() {
+    pauseTimer();
+    
+    // Play notification sound if enabled
+    if (AppState.timerSettings.notificationSound) {
+        playNotificationSound();
+    }
+    
+    if (AppState.timerType === 'work') {
+        // Work session completed
+        AppState.sessionsCompleted++;
+        AppState.totalTimeToday += AppState.timerSettings.workDuration;
+        saveDailyStats();
+        updateStatsDisplay();
+        
+        // Determine break type
+        const isLongBreak = AppState.sessionsCompleted % AppState.timerSettings.sessionsUntilLongBreak === 0;
+        AppState.timerType = isLongBreak ? 'long-break' : 'short-break';
+        AppState.timerSeconds = isLongBreak ? 
+            AppState.timerSettings.longBreak * 60 : 
+            AppState.timerSettings.shortBreak * 60;
+        
+        showCelebrationModal(
+            '🎉 Work Session Complete!',
+            `Great focus! Time for a ${isLongBreak ? 'long' : 'short'} break.`
+        );
+        
+        if (AppState.timerSettings.autoStartBreaks) {
+            setTimeout(() => startTimer(), 2000);
+        }
+    } else {
+        // Break completed
+        AppState.timerType = 'work';
+        AppState.timerSeconds = AppState.timerSettings.workDuration * 60;
+        
+        showCelebrationModal(
+            '⏰ Break Over!',
+            'Ready to get back to work? Let\'s stay productive!'
+        );
+        
+        if (AppState.timerSettings.autoStartBreaks) {
+            setTimeout(() => startTimer(), 2000);
+        }
+    }
+    
     updateTimerDisplay();
 }
 
 function updateTimerDisplay() {
-    const minutes = Math.floor(AppState.timerSeconds / 60);
-    const seconds = AppState.timerSeconds % 60;
-    document.getElementById('timer-display').textContent = 
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const timerDisplay = document.getElementById('timer-display');
+    const timerType = document.getElementById('timer-type');
+    
+    if (timerDisplay) {
+        const minutes = Math.floor(AppState.timerSeconds / 60);
+        const seconds = AppState.timerSeconds % 60;
+        timerDisplay.textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    if (timerType) {
+        const typeText = AppState.timerType === 'work' ? 'Work Session' :
+                         AppState.timerType === 'short-break' ? 'Short Break' : 'Long Break';
+        timerType.textContent = typeText;
+    }
+}
+
+function playNotificationSound() {
+    // Create a simple beep sound using Web Audio API
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+        console.log('Audio notification not supported');
+    }
+}
+
+// ============================================
+// DAILY GOALS
+// ============================================
+
+function setupDailyGoals() {
+    const addGoalBtn = document.getElementById('add-goal-btn');
+    if (addGoalBtn) {
+        addGoalBtn.addEventListener('click', () => showModal('add-goal-modal'));
+    }
+    
+    updateGoalsDisplay();
+}
+
+function updateGoalsDisplay() {
+    const goalsList = document.getElementById('daily-goals-list');
+    const goalsCompleted = document.getElementById('goals-completed');
+    const goalsTotal = document.getElementById('goals-total');
+    
+    goalsList.innerHTML = '';
+    
+    AppState.dailyGoals.forEach((goal, index) => {
+        const goalItem = document.createElement('div');
+        goalItem.className = `goal-item ${goal.completed ? 'completed' : ''}`;
+        
+        goalItem.innerHTML = `
+            <input type="checkbox" class="goal-checkbox" ${goal.completed ? 'checked' : ''} data-index="${index}">
+            <span class="goal-text">${goal.text}</span>
+            <span class="goal-time">${goal.time}m</span>
+            <button class="goal-delete" data-index="${index}">×</button>
+        `;
+        
+        goalItem.querySelector('.goal-checkbox').addEventListener('change', (e) => {
+            toggleGoal(index, e.target.checked);
+        });
+        
+        goalItem.querySelector('.goal-delete').addEventListener('click', () => {
+            deleteGoal(index);
+        });
+        
+        goalsList.appendChild(goalItem);
+    });
+    
+    const completed = AppState.dailyGoals.filter(g => g.completed).length;
+    const total = AppState.dailyGoals.length;
+    
+    goalsCompleted.textContent = completed;
+    goalsTotal.textContent = total;
+    
+    // Update progress ring
+    const progressRing = document.querySelector('.progress-ring-circle');
+    const circumference = 2 * Math.PI * 52;
+    const progress = total > 0 ? (completed / total) : 0;
+    const offset = circumference - (progress * circumference);
+    progressRing.style.strokeDashoffset = offset;
+}
+
+function addGoal(text, time) {
+    AppState.dailyGoals.push({
+        text: text,
+        time: parseInt(time),
+        completed: false,
+        createdAt: new Date().toISOString()
+    });
+    saveDailyGoals();
+    updateGoalsDisplay();
+}
+
+function toggleGoal(index, completed) {
+    AppState.dailyGoals[index].completed = completed;
+    saveDailyGoals();
+    updateGoalsDisplay();
+    
+    if (completed) {
+        const allCompleted = AppState.dailyGoals.every(g => g.completed);
+        if (allCompleted && AppState.dailyGoals.length > 0) {
+            setTimeout(() => {
+                showCelebrationModal(
+                    '🎊 All Goals Completed!',
+                    'Amazing work! You\'ve completed all your goals for today!'
+                );
+            }, 300);
+        }
+    }
+}
+
+function deleteGoal(index) {
+    AppState.dailyGoals.splice(index, 1);
+    saveDailyGoals();
+    updateGoalsDisplay();
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+K - Focus chat input
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            if (AppState.currentView === 'chat-view') {
+                document.getElementById('chat-input').focus();
+            }
+        }
+        
+        // Ctrl+T - Toggle timer
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            if (AppState.timerInterval) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+        
+        // Ctrl+M - Toggle mode
+        if (e.ctrlKey && e.key === 'm') {
+            e.preventDefault();
+            toggleMode();
+        }
+        
+        // Ctrl+G - Add goal
+        if (e.ctrlKey && e.key === 'g') {
+            e.preventDefault();
+            showModal('add-goal-modal');
+        }
+    });
+}
+
+// ============================================
+// SETTINGS
+// ============================================
+
+function setupSettings() {
+    const settingsBtn = document.getElementById('settings-btn');
+    const saveTimerSettingsBtn = document.getElementById('save-timer-settings');
+    const saveGoalBtn = document.getElementById('save-goal-btn');
+    const exportDataBtn = document.getElementById('export-data-btn');
+    const clearDataBtn = document.getElementById('clear-data-btn');
+    
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => showModal('settings-modal'));
+    }
+    
+    if (saveTimerSettingsBtn) {
+        saveTimerSettingsBtn.addEventListener('click', saveTimerSettings);
+    }
+    
+    if (saveGoalBtn) {
+        saveGoalBtn.addEventListener('click', saveGoal);
+    }
+    
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', exportData);
+    }
+    
+    if (clearDataBtn) {
+        clearDataBtn.addEventListener('click', clearAllData);
+    }
+}
+
+function saveTimerSettings() {
+    AppState.timerSettings.workDuration = parseInt(document.getElementById('work-duration').value);
+    AppState.timerSettings.shortBreak = parseInt(document.getElementById('short-break').value);
+    AppState.timerSettings.longBreak = parseInt(document.getElementById('long-break').value);
+    AppState.timerSettings.sessionsUntilLongBreak = parseInt(document.getElementById('sessions-until-long-break').value);
+    AppState.timerSettings.autoStartBreaks = document.getElementById('auto-start-breaks').checked;
+    AppState.timerSettings.notificationSound = document.getElementById('notification-sound').checked;
+    
+    localStorage.setItem('timerSettings', JSON.stringify(AppState.timerSettings));
+    
+    // Reset timer to new work duration
+    resetTimer();
+    
+    hideModal('timer-settings-modal');
+    showCelebrationModal('✅ Settings Saved', 'Timer settings updated successfully!');
+}
+
+function saveGoal() {
+    const goalText = document.getElementById('goal-input').value.trim();
+    const goalTime = document.getElementById('goal-time').value;
+    
+    if (goalText) {
+        addGoal(goalText, goalTime);
+        document.getElementById('goal-input').value = '';
+        document.getElementById('goal-time').value = '30';
+        hideModal('add-goal-modal');
+    }
+}
+
+function exportData() {
+    const data = {
+        goals: AppState.dailyGoals,
+        stats: {
+            sessions: AppState.sessionsCompleted,
+            totalTime: AppState.totalTimeToday,
+            date: new Date().toDateString()
+        },
+        timerSettings: AppState.timerSettings,
+        exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `study-mentor-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function clearAllData() {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+        localStorage.clear();
+        sessionStorage.clear();
+        location.reload();
+    }
 }
 
 // ============================================
@@ -749,29 +1285,33 @@ function setupModals() {
     const modalCloseBtns = document.querySelectorAll('.modal-close');
     const saveGoalChangesBtn = document.getElementById('save-goal-changes');
     
-    celebrationClose.addEventListener('click', () => hideModal('celebration-modal'));
+    if (celebrationClose) {
+        celebrationClose.addEventListener('click', () => hideModal('celebration-modal'));
+    }
     
     modalCancelBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal');
-            hideModal(modal.id);
+            if (modal) hideModal(modal.id);
         });
     });
     
     modalCloseBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal');
-            hideModal(modal.id);
+            if (modal) hideModal(modal.id);
         });
     });
     
-    saveGoalChangesBtn.addEventListener('click', saveGoalAdjustments);
+    if (saveGoalChangesBtn) {
+        saveGoalChangesBtn.addEventListener('click', saveGoalAdjustments);
+    }
     
     // Close modal on backdrop click
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
         backdrop.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal');
-            hideModal(modal.id);
+            if (modal) hideModal(modal.id);
         });
     });
     
@@ -779,9 +1319,26 @@ function setupModals() {
     const newTimeCommitment = document.getElementById('new-time-commitment');
     const newTimeValue = document.getElementById('new-time-value');
     
-    newTimeCommitment.addEventListener('input', () => {
-        newTimeValue.textContent = newTimeCommitment.value + ' hours/week';
-    });
+    if (newTimeCommitment && newTimeValue) {
+        newTimeCommitment.addEventListener('input', () => {
+            newTimeValue.textContent = newTimeCommitment.value + ' hours/week';
+        });
+    }
+    
+    // Load timer settings into modal
+    const workDuration = document.getElementById('work-duration');
+    const shortBreak = document.getElementById('short-break');
+    const longBreak = document.getElementById('long-break');
+    const sessionsUntilLongBreak = document.getElementById('sessions-until-long-break');
+    const autoStartBreaks = document.getElementById('auto-start-breaks');
+    const notificationSound = document.getElementById('notification-sound');
+    
+    if (workDuration) workDuration.value = AppState.timerSettings.workDuration;
+    if (shortBreak) shortBreak.value = AppState.timerSettings.shortBreak;
+    if (longBreak) longBreak.value = AppState.timerSettings.longBreak;
+    if (sessionsUntilLongBreak) sessionsUntilLongBreak.value = AppState.timerSettings.sessionsUntilLongBreak;
+    if (autoStartBreaks) autoStartBreaks.checked = AppState.timerSettings.autoStartBreaks;
+    if (notificationSound) notificationSound.checked = AppState.timerSettings.notificationSound;
 }
 
 function showModal(modalId) {

@@ -24,7 +24,7 @@ app.add_middleware(
 # Configure Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBWaCzAIn4b2Yb8_DMWTCX9SHZXC_uezXE")
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # In-memory storage (replace with database in production)
 roadmaps_db = {}

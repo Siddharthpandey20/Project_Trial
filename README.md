@@ -2,6 +2,46 @@
 
 An AI-powered study guide chatbot with personalized learning roadmaps and progress tracking, built with FastAPI and Google's Gemini AI.
 
+# AI Study Guide & Learning Mentor
+
+An AI-powered study guide chatbot with personalized learning roadmaps and progress tracking, built with FastAPI and Google's Gemini AI.
+
+## ✨ New Features Added!
+
+### 🌟 Hero/Landing Page
+- Beautiful animated welcome screen
+- Feature showcase with smooth animations
+- "Get Started" button to begin your journey
+
+### ⏰ Enhanced Pomodoro Timer
+- **Customizable durations** (work, short break, long break)
+- **Auto-switching** between work and break sessions  
+- **Session tracking** - counts completed sessions today
+- **Total time tracking** - shows total study time for the day
+- **Timer settings modal** - Configure all timer preferences
+- **Audio notifications** - Optional sound when timer completes
+
+### 🎯 Daily Goals Tracker  
+- **Add custom goals** with estimated time
+- **Visual progress ring** showing completion percentage
+- **Check off goals** as you complete them
+- **Delete goals** you no longer need
+- **Celebration** when all goals are completed!
+- **Auto-save** - goals persist in browser storage
+
+### ⌨️ Keyboard Shortcuts
+- `Ctrl + K` - Focus chat input
+- `Ctrl + T` - Start/pause timer
+- `Ctrl + M` - Toggle Focus/Friendly mode
+- `Ctrl + G` - Add new goal
+
+### ⚙️ Settings Panel
+- Theme persistence (remember your mode)
+- Timer configuration
+- Data export (download as JSON)
+- Clear all data option
+- Keyboard shortcuts reference
+
 ## Features
 
 - 🤖 **AI Chat Assistant**: Get study advice and learning guidance
