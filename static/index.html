@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered study guide chatbot with personalized learning roadmaps and progress tracking">
+    <title>AI Study Guide & Learning Mentor</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Initializing Your Learning Companion...</h2>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="app hidden">
+        <!-- Header with Mode Toggle -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎓 AI Study Mentor</h1>
+                </div>
+                <div class="header-controls">
+                    <button id="mode-toggle" class="btn btn--outline mode-toggle" aria-label="Toggle between Focus and Friendly mode">
+                        <span class="mode-icon">🌙</span>
+                        <span class="mode-text">Focus Mode</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mode Selection View -->
+        <section id="mode-selection" class="view mode-selection">
+            <div class="container">
+                <div class="mode-selection-content">
+                    <h2>Choose Your Learning Environment</h2>
+                    <p class="subtitle">Select the interface that matches your study style</p>
+                    
+                    <div class="mode-cards">
+                        <div class="mode-card" data-mode="focus">
+                            <div class="mode-icon-large">🌙</div>
+                            <h3>Focus Mode</h3>
+                            <p>Dark, minimal interface designed for deep concentration and distraction-free learning</p>
+                            <ul class="mode-features">
+                                <li>High contrast dark theme</li>
+                                <li>Minimal animations</li>
+                                <li>Pomodoro timer integration</li>
+                                <li>Keyboard shortcuts</li>
+                            </ul>
+                            <button class="btn btn--primary mode-select-btn">Select Focus Mode</button>
+                        </div>
+                        
+                        <div class="mode-card" data-mode="friendly">
+                            <div class="mode-icon-large">☀️</div>
+                            <h3>Friendly Mode</h3>
+                            <p>Warm, encouraging interface with celebrations and motivational elements</p>
+                            <ul class="mode-features">
+                                <li>Light, welcoming colors</li>
+                                <li>Smooth animations</li>
+                                <li>Milestone celebrations</li>
+                                <li>Emoji support</li>
+                            </ul>
+                            <button class="btn btn--primary mode-select-btn">Select Friendly Mode</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Interface View -->
+        <section id="chat-view" class="view chat-view hidden">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be dynamically inserted here -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="typing-indicator hidden" id="typing-indicator">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span>AI is thinking...</span>
+                    </div>
+                    
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="chat-input" 
+                            placeholder="Ask me about your learning goals, get study advice, or generate a personalized roadmap..." 
+                            rows="1"
+                            aria-label="Chat input"
+                        ></textarea>
+                        <div class="chat-actions">
+                            <button id="voice-input-btn" class="btn-icon" aria-label="Voice input" title="Voice input">
+                                🎤
+                            </button>
+                            <button id="send-btn" class="btn btn--primary" disabled>
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Sidebar -->
+            <div class="chat-sidebar">
+                <div class="sidebar-section">
+                    <h3>Quick Actions</h3>
+                    <button class="btn btn--secondary btn--full-width quick-action-btn" data-action="generate-roadmap">
+                        📚 Generate Learning Roadmap
+                    </button>
+                    <button class="btn btn--secondary btn--full-width quick-action-btn" data-action="view-progress">
+                        📊 View My Progress
+                    </button>
+                    <button class="btn btn--secondary btn--full-width quick-action-btn" data-action="study-techniques">
+                        🧠 Study Techniques
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Study Timer</h3>
+                    <div class="timer-display" id="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button id="timer-start" class="btn btn--sm">Start</button>
+                        <button id="timer-pause" class="btn btn--sm">Pause</button>
+                        <button id="timer-reset" class="btn btn--sm">Reset</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Today's Motivation</h3>
+                    <div class="motivation-card">
+                        <p id="daily-quote" class="quote-text">The expert in anything was once a beginner.</p>
+                        <p class="quote-author">- Helen Hayes</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap Generation View -->
+        <section id="roadmap-generation" class="view roadmap-generation hidden">
+            <div class="container">
+                <div class="roadmap-form-container">
+                    <h2>Create Your Personalized Learning Roadmap</h2>
+                    <p class="subtitle">Tell me about your goals and preferences, and I'll create tailored learning paths for you</p>
+
+                    <form id="roadmap-form" class="roadmap-form">
+                        <!-- Learning Goal -->
+                        <div class="form-group">
+                            <label for="learning-goal" class="form-label">What do you want to learn?</label>
+                            <input 
+                                type="text" 
+                                id="learning-goal" 
+                                class="form-control" 
+                                placeholder="e.g., React Development, Python Programming, Data Science..."
+                                required
+                                list="goal-suggestions"
+                            >
+                            <datalist id="goal-suggestions">
+                                <option value="React Development">
+                                <option value="Python Programming">
+                                <option value="Data Science">
+                                <option value="Machine Learning">
+                                <option value="Web Development">
+                                <option value="JavaScript">
+                                <option value="Node.js">
+                                <option value="SQL & Databases">
+                            </datalist>
+                        </div>
+
+                        <!-- Time Commitment -->
+                        <div class="form-group">
+                            <label for="time-commitment" class="form-label">
+                                Time Commitment: <span id="time-value">10</span> hours per week
+                            </label>
+                            <input 
+                                type="range" 
+                                id="time-commitment" 
+                                min="1" 
+                                max="40" 
+                                value="10" 
+                                class="slider"
+                                aria-label="Time commitment per week"
+                            >
+                            <div class="slider-labels">
+                                <span>1hr/week</span>
+                                <span>40hrs/week</span>
+                            </div>
+                        </div>
+
+                        <!-- Current Skill Level -->
+                        <div class="form-group">
+                            <label for="skill-level" class="form-label">Current Skill Level</label>
+                            <select id="skill-level" class="form-control" required>
+                                <option value="">Select your level...</option>
+                                <option value="beginner">Beginner - Just starting out</option>
+                                <option value="intermediate">Intermediate - Some experience</option>
+                                <option value="advanced">Advanced - Experienced learner</option>
+                            </select>
+                        </div>
+
+                        <!-- Learning Style Preferences -->
+                        <div class="form-group">
+                            <label class="form-label">Preferred Learning Styles (select all that apply)</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="learning-style" value="videos"> Videos & Tutorials
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="learning-style" value="articles"> Articles & Documentation
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="learning-style" value="projects"> Hands-on Projects
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="learning-style" value="interactive"> Interactive Coding
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Target Deadline -->
+                        <div class="form-group">
+                            <label for="deadline" class="form-label">Target Completion Date (optional)</label>
+                            <input 
+                                type="date" 
+                                id="deadline" 
+                                class="form-control"
+                                min=""
+                            >
+                        </div>
+
+                        <!-- Budget Preferences -->
+                        <div class="form-group">
+                            <label class="form-label">Budget Preference</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="budget" value="free" checked> Free resources only
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="budget" value="mixed"> Mix of free and paid resources
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="budget" value="premium"> Premium resources preferred
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="back-to-chat" class="btn btn--outline">
+                                ← Back to Chat
+                            </button>
+                            <button type="submit" class="btn btn--primary" id="generate-roadmaps">
+                                Generate My Roadmaps 🚀
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Generated Roadmaps -->
+                <div id="roadmap-results" class="roadmap-results hidden">
+                    <h2>Your Personalized Learning Paths</h2>
+                    <p class="subtitle">Choose the roadmap that best fits your lifestyle and goals</p>
+                    
+                    <div class="roadmap-comparison" id="roadmap-comparison">
+                        <!-- Roadmaps will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Dashboard View -->
+        <section id="progress-dashboard" class="view progress-dashboard hidden">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2 id="roadmap-title">React Development Journey</h2>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="completion-percentage">35%</div>
+                            <div class="stat-label">Complete</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="current-streak">7</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="time-remaining">8 weeks</div>
+                            <div class="stat-label">Remaining</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Today's Focus -->
+                    <div class="dashboard-section today-focus">
+                        <h3>Today's Focus</h3>
+                        <div class="focus-card">
+                            <h4 id="current-phase">State Management & Hooks</h4>
+                            <div class="daily-tasks" id="daily-tasks">
+                                <!-- Tasks will be dynamically loaded -->
+                            </div>
+                            <button class="btn btn--primary add-task-btn">+ Add Custom Task</button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Visualization -->
+                    <div class="dashboard-section progress-viz">
+                        <h3>Progress Overview</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="progress-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Milestone Timeline -->
+                    <div class="dashboard-section milestone-timeline">
+                        <h3>Learning Milestones</h3>
+                        <div class="timeline" id="milestone-timeline">
+                            <!-- Milestones will be dynamically loaded -->
+                        </div>
+                    </div>
+
+                    <!-- Study Session Logger -->
+                    <div class="dashboard-section study-logger">
+                        <h3>Study Session</h3>
+                        <div class="logger-content">
+                            <div class="session-timer">
+                                <div class="timer-circle">
+                                    <span id="session-time">00:00</span>
+                                </div>
+                                <div class="timer-actions">
+                                    <button id="start-session" class="btn btn--primary">Start Session</button>
+                                    <button id="end-session" class="btn btn--outline" disabled>End Session</button>
+                                </div>
+                            </div>
+                            <div class="manual-entry">
+                                <label for="manual-hours" class="form-label">Or log time manually:</label>
+                                <div class="time-input-group">
+                                    <input type="number" id="manual-hours" min="0" max="24" placeholder="0" class="form-control">
+                                    <span>hours</span>
+                                    <input type="number" id="manual-minutes" min="0" max="59" placeholder="0" class="form-control">
+                                    <span>minutes</span>
+                                    <button id="log-time" class="btn btn--secondary">Log Time</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions">
+                    <button class="btn btn--outline" id="adjust-goals">📝 Adjust Goals</button>
+                    <button class="btn btn--outline" id="get-help">💬 Get Help</button>
+                    <button class="btn btn--primary" id="continue-learning">🚀 Continue Learning</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modals -->
+    <!-- Celebration Modal -->
+    <div id="celebration-modal" class="modal hidden" role="dialog" aria-labelledby="celebration-title" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content celebration-modal">
+            <div class="celebration-animation">🎉</div>
+            <h2 id="celebration-title">Congratulations!</h2>
+            <p id="celebration-message">You've completed another milestone in your learning journey!</p>
+            <button class="btn btn--primary" id="celebration-close">Continue Learning</button>
+        </div>
+    </div>
+
+    <!-- Goal Adjustment Modal -->
+    <div id="goal-adjustment-modal" class="modal hidden" role="dialog" aria-labelledby="goal-adjustment-title" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="goal-adjustment-title">Adjust Your Goals</h2>
+                <button class="modal-close" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Feeling behind or want to speed up? Let's adjust your learning pace.</p>
+                <div class="form-group">
+                    <label class="form-label">New weekly time commitment:</label>
+                    <input type="range" id="new-time-commitment" min="1" max="40" value="10" class="slider">
+                    <span id="new-time-value">10 hours/week</span>
+                </div>
+                <div class="form-group">
+                    <label for="new-deadline" class="form-label">New target date:</label>
+                    <input type="date" id="new-deadline" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="save-goal-changes">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
